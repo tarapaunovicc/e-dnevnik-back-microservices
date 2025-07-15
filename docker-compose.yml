@@ -1,0 +1,115 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: e-dnevnik
+    ports:
+      - "3307:3306"
+    networks:
+      - backend
+
+  eureka-service:
+    build:
+      context: ./eureka-service
+    container_name: eureka-service
+    ports:
+      - "8761:8761"
+    networks:
+      - backend
+
+  #on koristi sve ove ispod
+  gateway:
+    build:
+      context: ./gateway
+    container_name: gateway
+    ports:
+      - "8084:8084"
+    depends_on:
+      - eureka-service
+      - auth-service
+      - class-service
+      - grade-service
+      - user-service
+      - attendance-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+    networks:
+      - backend
+
+  auth-service:
+    build:
+      context: ./auth-service
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql
+      - eureka-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+    networks:
+      - backend
+
+  user-service:
+    build:
+      context: ./user-service
+    container_name: user-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql
+      - eureka-service
+      - auth-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+    networks:
+      - backend
+
+  class-service:
+    build:
+      context: ./class-service
+    container_name: class-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - mysql
+      - eureka-service
+      #mozda jos nesto treba
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+    networks:
+      - backend
+
+  grade-service:
+    build:
+      context: ./grade-service
+    container_name: grade-service
+    ports:
+      - "8086:8086"
+    depends_on:
+      - mysql
+      - eureka-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+    networks:
+      - backend
+
+
+  attendance-service:
+    build:
+      context: ./attendance-service
+    container_name: attendance-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      - mysql
+      - eureka-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+    networks:
+      - backend
+
+networks:
+  backend:

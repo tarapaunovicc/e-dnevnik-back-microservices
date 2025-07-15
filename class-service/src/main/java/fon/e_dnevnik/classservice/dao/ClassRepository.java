@@ -1,0 +1,13 @@
+package fon.e_dnevnik.classservice.dao;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import fon.e_dnevnik.classservice.entity.Class;
+
+
+@Repository
+public interface ClassRepository extends JpaRepository<Class, Integer> {
+    Class findByClassTeacher (String username);
+}
+
+
