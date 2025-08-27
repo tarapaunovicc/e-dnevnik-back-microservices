@@ -12,7 +12,6 @@ public class StudentDTO {
     private String username;
     private String firstname;
     private String lastname;
+    private String UMCN;
     private ClassDTO studentClass;
-    private Collection<GradeDTO> grades;
-    private Collection<AbsenceDTO> absences;
 }

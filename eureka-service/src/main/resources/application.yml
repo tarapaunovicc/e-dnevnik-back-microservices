@@ -1,13 +1,17 @@
 server:
   port: 8761
 
+spring:
+  application:
+    name: eureka-service
+
 eureka:
   client:
     register-with-eureka: false
     fetch-registry: false
+  instance:
+    hostname: eureka-service
   server:
-    wait-time-in-ms-when-sync-empty: 0
-
-spring:
-  application:
-    name: eureka-service
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 5000
+    renewal-percent-threshold: 0.49

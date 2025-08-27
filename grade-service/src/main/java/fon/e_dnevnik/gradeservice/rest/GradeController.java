@@ -1,6 +1,7 @@
 package fon.e_dnevnik.gradeservice.rest;
 
 import fon.e_dnevnik.gradeservice.dto.GradeDTO;
+import fon.e_dnevnik.gradeservice.dto.help.GradeFilterRequest;
 import fon.e_dnevnik.gradeservice.service.GradeImplementation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,5 +29,16 @@ public class GradeController {
     @GetMapping("/student/{username}")
     public List<GradeDTO> getGrades(@PathVariable String username) throws Exception {
         return gradeImplementation.findByStudentUsername(username);
+    }
+    @PostMapping("/by-student-teacher")
+    public List<GradeDTO> findByStudentAndTeacher(@RequestBody GradeFilterRequest request) {
+        return gradeImplementation.findByStudentAndTeacher(
+                request.getStudentusername(),
+                request.getTeacherusername()
+        );
+    }
+    @GetMapping("/student2/{username}")
+    public List<GradeDTO> getGradesWithSubjects(@PathVariable String username) throws Exception {
+        return gradeImplementation.findByStudentUsernameWithSubject(username);
     }
 }

@@ -37,7 +37,7 @@ public class ClassService {
     }
 
     public ClassDTO findByClassTeacherUsername(String username)throws Exception {
-        Class cl = classRepository.findByClassTeacher(username);
+        Class cl = classRepository.findByClassTeacherUsername(username);
         if (cl != null) {
             return modelMapper.map(cl, ClassDTO.class);
         } else {

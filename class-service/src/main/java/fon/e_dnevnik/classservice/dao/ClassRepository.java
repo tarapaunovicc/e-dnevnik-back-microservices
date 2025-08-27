@@ -7,7 +7,7 @@ import fon.e_dnevnik.classservice.entity.Class;
 
 @Repository
 public interface ClassRepository extends JpaRepository<Class, Integer> {
-    Class findByClassTeacher (String username);
+    Class findByClassTeacherUsername (String username);
 }
 
 

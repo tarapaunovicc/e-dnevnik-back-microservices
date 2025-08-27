@@ -8,5 +8,7 @@ import java.util.List;
 
 @Repository
 public interface GradeRepository extends JpaRepository<Grade, Integer> {
-    List<Grade> findByStudentusername(String username);
+
+    List<Grade> findByStudentusername(String studentusername);
+    List<Grade> findByStudentusernameAndTeacherusername(String studentusername, String teacherusername);
 }

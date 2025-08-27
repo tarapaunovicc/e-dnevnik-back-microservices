@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import fon.e_dnevnik.attendanceservice.entity.Lesson;
 import fon.e_dnevnik.attendanceservice.dto.LessonDTO;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class LessonImplementation{
@@ -19,8 +20,29 @@ public class LessonImplementation{
         this.modelMapper = modelMapper;
     }
 
-    public LessonDTO save(LessonDTO lessonDTO) throws Exception {
-        Lesson lesson = modelMapper.map(lessonDTO, Lesson.class);
-        Lesson savedLesson = lessonRepository.save(lesson);
-        return modelMapper.map(savedLesson, LessonDTO.class);    }
+    @Transactional
+    public LessonDTO save(LessonDTO dto) {
+        if (dto.getClassid() == null) throw new IllegalArgumentException("classId je obavezan");
+        if (dto.getTeacherUsername() == null || dto.getTeacherUsername().isBlank())
+            throw new IllegalArgumentException("teacherUsername je obavezan");
+        if (dto.getDate() == null) throw new IllegalArgumentException("date je obavezan (format yyyy-MM-dd)");
+
+        Lesson e = new Lesson();
+        e.setClassid(dto.getClassid());
+        e.setTeacherUsername(dto.getTeacherUsername());
+        e.setDate(dto.getDate());
+        e.setClassOrdinalNumber(dto.getClassOrdinalNumber());
+        e.setCurriculum(dto.getCurriculum());
+
+        e = lessonRepository.save(e);
+
+        LessonDTO out = new LessonDTO();
+        out.setLessonid(e.getLessonid());
+        out.setClassid(e.getClassid());
+        out.setTeacherUsername(e.getTeacherUsername());
+        out.setDate(e.getDate());
+        out.setClassOrdinalNumber(e.getClassOrdinalNumber());
+        out.setCurriculum(e.getCurriculum());
+        return out;
+    }
 }

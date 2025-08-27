@@ -2,6 +2,7 @@ package fon.e_dnevnik.authservice.security;
 
 import fon.e_dnevnik.authservice.security.filter.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,54 +22,36 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-
     private final JwtAuthenticationFilter jwtAuthFilter;
-
     private final AuthenticationProvider authenticationProvider;
-
-    private final LogoutHandler logoutHandler;
-
+    private final org.springframework.security.web.authentication.logout.LogoutHandler logoutHandler;
 
     @Bean
-    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
-
-                    @Override
-                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                        System.out.println("Proverava konfiguraciju server");
-                        CorsConfiguration config = new CorsConfiguration();
-                        config.setAllowedOrigins(List.of("http://localhost:4200"));
-                        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                        config.setAllowCredentials(true);
-                        config.setAllowedHeaders(List.of("*"));
-                        config.setExposedHeaders(List.of("Authorization"));
-                        config.setMaxAge(3600L);
-                        return config;
-                    }
-                })).csrf((csrf) -> csrf.disable())
-                .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("**").permitAll())
-//                        .requestMatchers(HttpMethod.POST, "/transactions/plizSave").hasAnyRole("CLIENT")
-//                        .requestMatchers(HttpMethod.GET, "/transactions").hasAnyRole("CLIENT", "EMPLOYEE")
-//                        .requestMatchers(HttpMethod.GET, "/transactions/{id}").hasAnyRole("CLIENT", "EMPLOYEE")
-//                        .requestMatchers(HttpMethod.POST, "/accounts/**", "/clients/**", "/loans/**").hasAnyRole("CLIENT", "EMPLOYEE")
-//                        .requestMatchers(HttpMethod.GET, "/accounts/**").hasAnyRole("CLIENT", "EMPLOYEE")
-//                        .requestMatchers(HttpMethod.GET, "/clients/**").hasAnyRole("CLIENT", "EMPLOYEE")
-//                        .requestMatchers(HttpMethod.GET, "/clients/{id}/accounts").hasAnyRole("CLIENT", "EMPLOYEE")
-//                        .requestMatchers(HttpMethod.GET, "/clients/{id}").hasAnyRole("CLIENT", "EMPLOYEE")
-//                        .requestMatchers(HttpMethod.GET, "/loans/**").hasRole("EMPLOYEE")//                    .requestMatchers("/auth/**").permitAll())
+    public SecurityFilterChain defaultSecurityFilterChain(org.springframework.security.config.annotation.web.builders.HttpSecurity http) throws Exception {
+        http
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/**").permitAll()   // ostavljam kako si imala
+                )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .logout(logoutConfigurer -> logoutConfigurer
-                        .logoutUrl("/auth/logout")
+                .logout(logout -> logout
+                        .logoutUrl("/auth/logout") // POST /auth/logout
                         .addLogoutHandler(logoutHandler)
-                        .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            SecurityContextHolder.clearContext();
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"message\":\"Logged out\"}");
+                            response.getWriter().flush(); // ostavljeno kao kod tebe
+                        })
                 );
+
         return http.build();
     }
 }

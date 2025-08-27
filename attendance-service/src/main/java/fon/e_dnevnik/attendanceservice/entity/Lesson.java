@@ -1,7 +1,5 @@
 package fon.e_dnevnik.attendanceservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import fon.e_dnevnik.attendanceservice.entity.primarykey.LessonPK;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,36 +7,33 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 @Entity
-@Table(name="lesson")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Table(
+        name = "lesson",
+        indexes = {
+                @Index(name = "idx_lesson_class_teacher_date", columnList = "classid, teacherusername, date"),
+                @Index(name = "idx_lesson_class_ord", columnList = "classid, date, classordinalnumber")
+        }
+)
+@Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class Lesson implements Serializable {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer classid;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String username;
-
     @Id
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "lesson_id")
     private Integer lessonid;
 
-    @Column(name="date")
+    @Column(name = "classid", nullable = false)
+    private Integer classid;
+
+    @Column(name = "teacherusername", nullable = false, length = 255)
+    private String teacherUsername;
+
+    @Column(name = "date", nullable = false)
     private LocalDate date;
 
-    @Column(name="classordinalnumber")
+    @Column(name = "classordinalnumber", nullable = false)
     private int classOrdinalNumber;
 
-    @Column(name="curriculum")
+    @Column(name = "curriculum")
     private String curriculum;
-
-    public Lesson(Integer classid, String username, Integer lessonid) {
-        this.classid = classid;
-        this.username = username;
-        this.lessonid = lessonid;
-    }
 }

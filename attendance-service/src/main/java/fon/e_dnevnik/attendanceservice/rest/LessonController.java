@@ -20,8 +20,14 @@ public class LessonController {
         this.lessonImplementation = lessonImplementation;
     }
 
-    @PostMapping("/new")
-    public ResponseEntity<LessonDTO> save( @RequestBody LessonDTO lessonDTO) throws Exception {
-        return new ResponseEntity<>(lessonImplementation.save(lessonDTO), HttpStatus.CREATED);
+    @PostMapping(
+            value = "/new",
+            consumes = org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
+            produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<LessonDTO> save(@RequestBody LessonDTO lessonDTO) {
+        System.out.println(lessonDTO);
+        LessonDTO created = lessonImplementation.save(lessonDTO);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 }

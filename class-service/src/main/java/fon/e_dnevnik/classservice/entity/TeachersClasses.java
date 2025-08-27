@@ -18,4 +18,7 @@ public class TeachersClasses implements Serializable {
     @EmbeddedId
     private TeachersClassesPK id;
 
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "classid", referencedColumnName = "classid", insertable = false, updatable = false)
+    private Class cl;
 }

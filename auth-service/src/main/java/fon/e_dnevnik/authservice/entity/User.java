@@ -1,9 +1,6 @@
 package fon.e_dnevnik.authservice.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,8 +27,9 @@ public class User implements Serializable, UserDetails {
     @Column(name="password")
     private String password;
 
+    @Enumerated(EnumType.STRING)
     @Column (name="role")
-    private String role;
+    private Role role;
 
     @Override
     public boolean equals(Object o) {
@@ -55,7 +53,7 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role));
+        return List.of(new SimpleGrantedAuthority(role.toString()));
     }
 
     @Override

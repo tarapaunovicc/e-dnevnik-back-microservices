@@ -14,8 +14,5 @@ public class TeachersClassesDTO {
     private String teacherusername;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private TeacherDTO teacher;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private ClassDTO cl;
 }

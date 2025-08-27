@@ -16,7 +16,7 @@ public class Class implements Serializable {
     @Id
     @Column(name="classid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int classId;
+    private int classid;
 
     @Column(name="grade")
     private int grade;
@@ -25,5 +25,5 @@ public class Class implements Serializable {
     private int number;
 
     @Column(name="classteacher")
-    private String classTeacher;
+    private String classTeacherUsername;
 }

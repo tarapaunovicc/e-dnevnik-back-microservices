@@ -6,7 +6,7 @@ spring:
     name: attendance-service
 
   datasource:
-    url: jdbc:mysql://mysql:3306/e-dnevnik
+    url: jdbc:mysql://mysql:3306/attendance_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -15,7 +15,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-    database-platform: org.hibernate.dialect.MySQL8Dialect
+    properties:
+      hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
+#    database-platform: org.hibernate.dialect.MySQL8Dialect
 
 eureka:
   client:
@@ -23,3 +25,12 @@ eureka:
       defaultZone: http://eureka-service:8761/eureka
     register-with-eureka: true
     fetch-registry: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "mappings"
+logging:
+  level:
+    org.springframework.web: debug

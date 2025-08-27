@@ -22,13 +22,18 @@ public class AuthenticationController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authentication(@Valid @RequestBody AuthenticationRequest request){
-        System.out.println("Prvo");
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
-    @GetMapping("/validate")
-    public ResponseEntity<UserTokenInfoDTO> validateToken(@RequestHeader("Authorization") String token) {
-        String jwt = token.substring(7);
+//
+@GetMapping("/validate")
+public ResponseEntity<UserTokenInfoDTO> validateToken(@RequestHeader("Authorization") String authHeader) {
+    try {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String jwt = authHeader.substring(7);
+
         if (jwtService.isTokenExpired(jwt)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -36,9 +41,15 @@ public class AuthenticationController {
         String username = jwtService.extractUsername(jwt);
         String userType = jwtService.extractUserType(jwt);
 
-        UserTokenInfoDTO dto = new UserTokenInfoDTO(username, userType);
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(new UserTokenInfoDTO(username, userType));
+    } catch (io.jsonwebtoken.ExpiredJwtException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+}
+
+
 
     @PostMapping("/refreshToken")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {

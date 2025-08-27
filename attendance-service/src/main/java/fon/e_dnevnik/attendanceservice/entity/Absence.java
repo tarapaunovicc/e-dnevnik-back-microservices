@@ -1,5 +1,6 @@
 package fon.e_dnevnik.attendanceservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import fon.e_dnevnik.attendanceservice.entity.primarykey.AbsencePK;
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,26 +8,24 @@ import lombok.*;
 import java.io.Serializable;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
-@Builder
-@Table(name = "absence")
+@Table(
+        name = "absence",
+        indexes = {
+                @Index(name = "idx_absence_lesson", columnList = "lesson_id"),
+                @Index(name = "idx_absence_student", columnList = "studentusername")
+        }
+)
+@Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class Absence implements Serializable {
 
     @EmbeddedId
     private AbsencePK id;
 
-    @Column(name="excused")
+    @Column(name = "excused", nullable = false)
     private boolean excused;
 
-    @Column(name="isfinal")
+    @Column(name = "isfinal", nullable = false)
     private boolean isfinal;
 
-    public Absence(AbsencePK id) {
-        this.id = id;
-    }
-    public Absence(String stusername, int id, String tcusername, int lessonid){
-        this.id=new AbsencePK(stusername,id,tcusername,lessonid);
-    }
+
 }

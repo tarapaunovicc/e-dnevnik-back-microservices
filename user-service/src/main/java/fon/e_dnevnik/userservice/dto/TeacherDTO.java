@@ -14,5 +14,4 @@ public class TeacherDTO {
     private String lastname;
     private SubjectDTO subject;
 
-    private Collection<TeachersClassesDTO> classes; //OVDE TI JE GRESKA U MONOLITU
 }

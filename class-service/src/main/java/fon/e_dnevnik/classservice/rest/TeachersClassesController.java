@@ -20,8 +20,8 @@ public class TeachersClassesController {
     public TeachersClassesController(TeachersClassesService teachersClassesImplementation) {
         this.teachersClassesImplementation = teachersClassesImplementation;
     }
-    @GetMapping("{username}")
-    public List<TeachersClassesDTO> findByTeacherUsername(@PathVariable String username){
+    @GetMapping("/{username}")
+    public List<TeachersClassesDTO> findByTeacherUsername(@PathVariable String username) {
         return teachersClassesImplementation.findByTeacherUsername(username);
     }
 }

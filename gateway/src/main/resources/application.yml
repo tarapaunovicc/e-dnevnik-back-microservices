@@ -9,37 +9,61 @@ spring:
 
   cloud:
     gateway:
-      routes:
-        - id: user-service
-          uri: http://user-service:8082
-          predicates:
-            - Path=/users/**
-        - id: class-service
-          uri: http://class-service:8083
-          filters:
-            - AddRequestHeader=X-Gateway-Auth,valid
-          predicates:
-            - Path=/classes/**
-        - id: auth-service
-          uri: http://auth:8081
-          predicates:
-            - Path=/auth/**
-        - id: attendance-service
-          uri: http://attendance:8085
-          filters:
-            - AddRequestHeader=X-Gateway-Auth,valid
-          predicates:
-            - Path=/absences/**, /lessons/**
-        - id: grade-service
-          uri: http://grade-service:8086
-          filters:
-            - AddRequestHeader=X-Gateway-Auth,valid
-          predicates:
-            - Path=/grades/**
       discovery:
         locator:
           enabled: true
           lower-case-service-id: true
+
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:4200"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            exposedHeaders:
+              - "Authorization"
+            allowCredentials: true
+
+      routes:
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/**
+
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/users/**,/teachers/**,/students/**
+
+        - id: class-service
+          uri: lb://CLASS-SERVICE
+          predicates:
+            - Path=/classes/**,/teachersclasses/**
+          filters:
+            - AddRequestHeader=X-Gateway-Auth,valid
+
+        - id: attendance-service
+          uri: lb://ATTENDANCE-SERVICE
+          predicates:
+            - Path=/absences/**,/lessons/**
+          filters:
+            - AddRequestHeader=X-Gateway-Auth,valid
+
+        - id: grade-service
+          uri: lb://grade-service
+          predicates:
+            - Path=/grades/**
+          filters:
+            - AddRequestHeader=X-Gateway-Auth,valid
+
 eureka:
   client:
     service-url:

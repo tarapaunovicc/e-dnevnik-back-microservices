@@ -7,4 +7,6 @@ public class ClassDTO {
     private int classid;
     private int grade;
     private int number;
+    private String classTeacherUsername;
+
 }

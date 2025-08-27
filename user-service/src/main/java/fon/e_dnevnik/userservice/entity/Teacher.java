@@ -9,40 +9,23 @@ import java.util.Collection;
 import java.util.Objects;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
-@Builder
-@Table(name="teacher")
+@Table(name = "teacher")
+@Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class Teacher implements Serializable {
 
     @Id
-    @Column(name="username")
+    @Column(name = "username")
     private String username;
 
-    @Column(name="firstname")
+    @Column(name = "firstname")
     private String firstname;
 
-    @Column(name="lastname")
+    @Column(name = "lastname")
     private String lastname;
 
-    @Column(name="subject") //ili je subjectid
-    private int subject;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "subject", referencedColumnName = "subjectid")
+    private Subject subject;
 
-    @Column(name="username1")
-    private String userTeacher;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Teacher teacher = (Teacher) o;
-        return Objects.equals(getUsername(), teacher.getUsername()) && Objects.equals(getFirstname(), teacher.getFirstname()) && Objects.equals(getLastname(), teacher.getLastname())
-                && Objects.equals(getSubject(), teacher.getSubject()) && Objects.equals(getUserTeacher(), teacher.getUserTeacher());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getUsername(), getFirstname(), getLastname(), getSubject(), getUserTeacher());
-    }
 }

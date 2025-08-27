@@ -1,24 +1,25 @@
 package fon.e_dnevnik.attendanceservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDate;
 @Data
 public class LessonDTO {
 
-    private Integer classid;
-
-    private String username;
-
     private Integer lessonid;
 
+    @JsonAlias({"classid","classId"})
+    private Integer classid;
+
+    @JsonAlias({"teacherusername","teacherUsername"})
+    private String teacherUsername;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
-    private int classOrdinalNumber;
-
+    @JsonAlias({"classordinalnumber","classOrdinalNumber"})
+    private Integer classOrdinalNumber;
     private String curriculum;
-
-    private TeacherDTO teacher;
-
-    private ClassDTO cl;
 }

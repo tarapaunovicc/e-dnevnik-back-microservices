@@ -23,59 +23,80 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-
     private final JwtService jwtService;
-
-
     private final UserDetailsService userDetailsService;
-
-
     private final TokenRepository tokenRepository;
 
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain)
-            throws ServletException, IOException {
+            @NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
 
-        if (request.getServletPath().contains("/api/v1/auth")) {
+        final String method = request.getMethod();
+        final String path   = request.getServletPath();
+
+        // 0) CORS preflight — uvek pusti
+        if ("OPTIONS".equalsIgnoreCase(method)) {
             filterChain.doFilter(request, response);
             return;
         }
+
+        // 1) Javno dostupne rute — preskoči JWT proveru
+        if (isWhitelisted(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // 2) Izvuci Authorization header i JWT
         final String authHeader = request.getHeader("Authorization");
-        System.out.println(authHeader);
-        final String jwt;
-        final String userUsername;
-        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
-        jwt = authHeader.substring(7);
-        System.out.println(jwt);
-        userUsername = jwtService.extractUsername(jwt);
-        System.out.println("Username je: " + userUsername);
-        if (userUsername != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            System.out.println("Ulazi u if ");
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userUsername);
-            var isTokenValid = tokenRepository.findByToken(jwt)
+
+        final String jwt = authHeader.substring(7);
+        String username = null;
+        try {
+            username = jwtService.extractUsername(jwt);
+        } catch (Exception ignored) {
+            // npr. expired/invalid token — samo pusti chain bez autentikacije
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // 3) Ako već NEMA autentikacije u kontekstu — proveri token i postavi je
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            boolean storedTokenValid = tokenRepository.findByToken(jwt)
                     .map(t -> !t.isExpired() && !t.isRevoked())
                     .orElse(false);
-            System.out.println("Pronalazi token." + isTokenValid);
-            if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
-                System.out.println("Token je validan.");
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+
+            if (storedTokenValid && jwtService.isTokenValid(jwt, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
+
+        // 4) Nastavi lanac
         filterChain.doFilter(request, response);
     }
-}
 
+    private boolean isWhitelisted(String path) {
+        // dozvoli /auth/** i /actuator/** uvek
+        if (path.startsWith("/auth/") || path.startsWith("/actuator/")) return true;
+
+        // ako i dalje koristiš staru rutu, ostavi ovo; inače obriši
+        if (path.startsWith("/api/v1/auth")) return true;
+
+        return false;
+    }
+}

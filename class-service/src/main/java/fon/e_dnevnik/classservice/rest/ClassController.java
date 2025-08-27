@@ -28,6 +28,7 @@ public class ClassController {
 
     @GetMapping("/find/{id}")
     public ResponseEntity<ClassDTO> findByClassTeacherUsername(@PathVariable String id) throws Exception {
+        System.out.println("TU SAMMMMMMMMMMMMMMMMMM HELOU");
         return ResponseEntity.ok().body(classImplementation.findByClassTeacherUsername((String)id));
     }
 }

@@ -1,14 +1,23 @@
+
 services:
   mysql:
     image: mysql:8
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: e-dnevnik
     ports:
       - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
     networks:
       - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -p\"$MYSQL_ROOT_PASSWORD\" --silent" ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 120s
 
   eureka-service:
     build:
@@ -19,7 +28,6 @@ services:
     networks:
       - backend
 
-  #on koristi sve ove ispod
   gateway:
     build:
       context: ./gateway
@@ -27,12 +35,18 @@ services:
     ports:
       - "8084:8084"
     depends_on:
-      - eureka-service
-      - auth-service
-      - class-service
-      - grade-service
-      - user-service
-      - attendance-service
+      eureka-service:
+        condition: service_started
+      auth-service:
+        condition: service_started
+      class-service:
+        condition: service_started
+      grade-service:
+        condition: service_started
+      user-service:
+        condition: service_started
+      attendance-service:
+        condition: service_started
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
     networks:
@@ -45,10 +59,15 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - mysql
-      - eureka-service
+      mysql:
+        condition: service_healthy
+      eureka-service:
+        condition: service_started
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/auth_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
     networks:
       - backend
 
@@ -59,11 +78,17 @@ services:
     ports:
       - "8082:8082"
     depends_on:
-      - mysql
-      - eureka-service
-      - auth-service
+      mysql:
+        condition: service_healthy
+      eureka-service:
+        condition: service_started
+      auth-service:
+        condition: service_started
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/user_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
     networks:
       - backend
 
@@ -74,28 +99,40 @@ services:
     ports:
       - "8083:8083"
     depends_on:
-      - mysql
-      - eureka-service
-      #mozda jos nesto treba
+      mysql:
+        condition: service_healthy
+      eureka-service:
+        condition: service_started
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/class_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
     networks:
       - backend
 
   grade-service:
+    hostname: grade-service
     build:
       context: ./grade-service
     container_name: grade-service
     ports:
       - "8086:8086"
     depends_on:
-      - mysql
-      - eureka-service
+      mysql:
+        condition: service_healthy
+      eureka-service:
+        condition: service_started
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/grade_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - EUREKA_INSTANCE_HOSTNAME=grade-service
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=false
+      - EUREKA_INSTANCE_NON_SECURE_PORT=8086
     networks:
       - backend
-
 
   attendance-service:
     build:
@@ -104,12 +141,20 @@ services:
     ports:
       - "8085:8085"
     depends_on:
-      - mysql
-      - eureka-service
+      mysql:
+        condition: service_healthy
+      eureka-service:
+        condition: service_started
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/attendance_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
     networks:
       - backend
 
 networks:
   backend:
+
+volumes:
+  mysql_data:

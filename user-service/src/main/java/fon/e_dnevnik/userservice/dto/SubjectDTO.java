@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 public class SubjectDTO {
 
-    private int subjectId;
+    private Integer subjectid;
     private String name;
 }

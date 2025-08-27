@@ -1,46 +1,31 @@
 package fon.e_dnevnik.gradeservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.io.Serializable;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "grade")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Builder
-@Table(name = "grade")
 public class Grade implements Serializable {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(nullable = false)
     private String studentusername;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Column(nullable = false)
     private String teacherusername;
 
-    @Id
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer gradeid;
-
-    @Column(name = "date")
+    @Column(nullable = false)
     private LocalDate date;
 
-    @Column(name = "grade")
+    @Column(nullable = false)
     private int grade;
-
-    public Grade(String studentusername, String teacherusername, Integer gradeid) {
-        this.studentusername = studentusername;
-        this.teacherusername = teacherusername;
-        this.gradeid = gradeid;
-    }
-
-    public void setID(String studentusername, String teacherusername, Integer gradeid) {
-        this.studentusername = studentusername;
-        this.teacherusername = teacherusername;
-        this.gradeid = gradeid;
-    }
 }

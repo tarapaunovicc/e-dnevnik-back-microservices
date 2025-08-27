@@ -1,11 +1,14 @@
 package fon.e_dnevnik.attendanceservice.rest;
 
 import fon.e_dnevnik.attendanceservice.dto.AbsenceDTO;
+import fon.e_dnevnik.attendanceservice.entity.Absence;
 import fon.e_dnevnik.attendanceservice.service.AbsenceImplementation;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -14,17 +17,18 @@ import java.util.List;
 public class AbsenceController {
     private AbsenceImplementation absenceImplementation;
 
+    private static final Logger log = LoggerFactory.getLogger(AbsenceController.class);
 
     @Autowired
     public AbsenceController(AbsenceImplementation absenceImplementation) {
         this.absenceImplementation = absenceImplementation;
     }
 
-    @PostMapping("/new")
-    public ResponseEntity<AbsenceDTO> save(@RequestBody AbsenceDTO absenceDTO) throws Exception {
-        return new ResponseEntity<>(absenceImplementation.save(absenceDTO), HttpStatus.CREATED);
+    @PostMapping(value = "/new", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Absence> save(@RequestBody AbsenceDTO body) {
+        var saved = absenceImplementation.save(body);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
-
     @GetMapping("/all/{username}")
     public List<AbsenceDTO> findByStudentUsername(@PathVariable String username) {
         return absenceImplementation.findByIdStudentusername(username);
