@@ -1,12 +1,8 @@
 package fon.e_dnevnik.userservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Objects;
 
 @Entity
 @Table(name = "teacher")

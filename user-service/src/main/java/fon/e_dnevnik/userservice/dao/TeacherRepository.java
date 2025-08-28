@@ -11,8 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface TeacherRepository extends JpaRepository<Teacher, String> {
-    Optional<Teacher> findByUsername(String userTeacher);
-
     @Query("select t from Teacher t left join fetch t.subject where t.username = :username")
     Optional<Teacher> findByUsernameWithSubject(@Param("username") String username);
 }

@@ -37,19 +37,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String method = request.getMethod();
         final String path   = request.getServletPath();
 
-        // 0) CORS preflight — uvek pusti
         if ("OPTIONS".equalsIgnoreCase(method)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 1) Javno dostupne rute — preskoči JWT proveru
         if (isWhitelisted(path)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 2) Izvuci Authorization header i JWT
         final String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -61,12 +58,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             username = jwtService.extractUsername(jwt);
         } catch (Exception ignored) {
-            // npr. expired/invalid token — samo pusti chain bez autentikacije
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 3) Ako već NEMA autentikacije u kontekstu — proveri token i postavi je
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
@@ -86,15 +81,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        // 4) Nastavi lanac
         filterChain.doFilter(request, response);
     }
 
     private boolean isWhitelisted(String path) {
-        // dozvoli /auth/** i /actuator/** uvek
         if (path.startsWith("/auth/") || path.startsWith("/actuator/")) return true;
 
-        // ako i dalje koristiš staru rutu, ostavi ovo; inače obriši
         if (path.startsWith("/api/v1/auth")) return true;
 
         return false;

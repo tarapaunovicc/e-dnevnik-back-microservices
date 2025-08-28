@@ -1,25 +1,18 @@
 package fon.e_dnevnik.classservice.service;
 
-import fon.e_dnevnik.classservice.dto.TeacherDTO;
 import fon.e_dnevnik.classservice.entity.Class;
 import fon.e_dnevnik.classservice.dao.ClassRepository;
 import fon.e_dnevnik.classservice.dto.ClassDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ClassService {
-    private final RestTemplate restTemplate;
     private final ModelMapper modelMapper;
     private final ClassRepository classRepository;
 
-    public ClassService(RestTemplate restTemplate, ModelMapper modelMapper, ClassRepository classRepository) {
-        this.restTemplate = restTemplate;
+    public ClassService(ModelMapper modelMapper, ClassRepository classRepository) {
         this.modelMapper = modelMapper;
         this.classRepository = classRepository;
     }
@@ -36,7 +29,7 @@ public class ClassService {
         }
     }
 
-    public ClassDTO findByClassTeacherUsername(String username)throws Exception {
+    public ClassDTO findByClassTeacherUsername(String username){
         Class cl = classRepository.findByClassTeacherUsername(username);
         if (cl != null) {
             return modelMapper.map(cl, ClassDTO.class);

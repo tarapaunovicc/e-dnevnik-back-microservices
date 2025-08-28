@@ -3,10 +3,8 @@ package fon.e_dnevnik.classservice.rest;
 
 import fon.e_dnevnik.classservice.dto.ClassDTO;
 import fon.e_dnevnik.classservice.service.ClassService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,12 +21,11 @@ public class ClassController {
 
     @GetMapping("{id}")
     public ResponseEntity<ClassDTO> findById(@PathVariable Integer id) throws Exception {
-        return ResponseEntity.ok().body(classImplementation.findById((Integer)id));
+        return ResponseEntity.ok().body(classImplementation.findById(id));
     }
 
     @GetMapping("/find/{id}")
     public ResponseEntity<ClassDTO> findByClassTeacherUsername(@PathVariable String id) throws Exception {
-        System.out.println("TU SAMMMMMMMMMMMMMMMMMM HELOU");
-        return ResponseEntity.ok().body(classImplementation.findByClassTeacherUsername((String)id));
+        return ResponseEntity.ok().body(classImplementation.findByClassTeacherUsername(id));
     }
 }

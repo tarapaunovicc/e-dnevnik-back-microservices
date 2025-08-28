@@ -40,18 +40,6 @@ public class GradeImplementation {
         Grade saved = gradeRepository.save(entity);
         return toDto(saved);
     }
-//    public GradeDTO save(@Valid GradeDTO dto) {
-//        Grade entity = modelMapper.map(dto, Grade.class);
-//
-//        // Biznis pravilo: ako nema datuma, stavi današnji (ovo JE bolje da ostane u servisu, ne u mapperu)
-//        if (entity.getDate() == null) {
-//            entity.setDate(LocalDate.now());
-//        }
-//
-//        Grade saved = gradeRepository.save(entity);
-//        return modelMapper.map(saved, GradeDTO.class);
-//    }
-
     public List<GradeDTO> findByStudentUsername(String username) {
         return gradeRepository.findByStudentusername(username)
                 .stream()
@@ -90,7 +78,6 @@ public class GradeImplementation {
                 .map(grade -> modelMapper.map(grade, GradeDTO.class))
                 .collect(Collectors.toList());
     }
-
     private GradeDTO toDto(Grade g) {
         GradeDTO dto = new GradeDTO();
         dto.setId(g.getId());

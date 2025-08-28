@@ -18,6 +18,7 @@ public class AbsenceDTO {
     private boolean excused;
     private boolean isfinal;
     private LessonDTO lesson;
+    private String subjectname;
 
     @JsonIgnore
     public AbsencePK getId() {

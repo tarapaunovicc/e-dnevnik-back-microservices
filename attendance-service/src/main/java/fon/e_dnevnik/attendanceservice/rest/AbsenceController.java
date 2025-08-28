@@ -3,21 +3,17 @@ package fon.e_dnevnik.attendanceservice.rest;
 import fon.e_dnevnik.attendanceservice.dto.AbsenceDTO;
 import fon.e_dnevnik.attendanceservice.entity.Absence;
 import fon.e_dnevnik.attendanceservice.service.AbsenceImplementation;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/absences")
 public class AbsenceController {
-    private AbsenceImplementation absenceImplementation;
-
-    private static final Logger log = LoggerFactory.getLogger(AbsenceController.class);
+    private final AbsenceImplementation absenceImplementation;
 
     @Autowired
     public AbsenceController(AbsenceImplementation absenceImplementation) {

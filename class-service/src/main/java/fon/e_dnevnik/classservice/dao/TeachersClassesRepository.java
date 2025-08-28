@@ -11,18 +11,6 @@ import java.util.List;
 
 @Repository
 public interface TeachersClassesRepository extends JpaRepository<TeachersClasses, TeachersClassesPK> {
-//    List<TeachersClasses> findByIdTeacherusername(String username);
-    @Query("select tc from TeachersClasses tc where tc.id.teacherusername = :username")
-    List<TeachersClasses> findAllByTeacherUsername(@Param("username") String username);
-
-    @Query(
-            value = "SELECT tc.classid, tc.teacherusername " +
-                    "FROM teachersclasses tc " +
-                    "WHERE tc.teacherusername = :username",
-            nativeQuery = true
-    )
-    List<TeachersClasses> findNativeByTeacher(@Param("username") String username);
-
     @Query("""
            select tc
            from TeachersClasses tc

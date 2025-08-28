@@ -8,15 +8,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class TeacherService {
-    private TeacherRepository teacherRepository;
-    private ModelMapper modelMapper;
+    private final TeacherRepository teacherRepository;
+    private final ModelMapper modelMapper;
 
     @Autowired
     public TeacherService(TeacherRepository teacherRepository, ModelMapper modelMapper) {

@@ -25,32 +25,26 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
-//
-@GetMapping("/validate")
-public ResponseEntity<UserTokenInfoDTO> validateToken(@RequestHeader("Authorization") String authHeader) {
-    try {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+    @GetMapping("/validate")
+    public ResponseEntity<UserTokenInfoDTO> validateToken(@RequestHeader("Authorization") String authHeader) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            String jwt = authHeader.substring(7);
+
+            if (jwtService.isTokenExpired(jwt)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            String username = jwtService.extractUsername(jwt);
+            String userType = jwtService.extractUserType(jwt);
+
+            return ResponseEntity.ok(new UserTokenInfoDTO(username, userType));
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        String jwt = authHeader.substring(7);
-
-        if (jwtService.isTokenExpired(jwt)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        String username = jwtService.extractUsername(jwt);
-        String userType = jwtService.extractUserType(jwt);
-
-        return ResponseEntity.ok(new UserTokenInfoDTO(username, userType));
-    } catch (io.jsonwebtoken.ExpiredJwtException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-}
-
-
-
     @PostMapping("/refreshToken")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         authenticationService.refreshToken(request, response);

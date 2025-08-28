@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/teachersclasses")
 public class TeachersClassesController {
-    private TeachersClassesService teachersClassesImplementation;
+    private final TeachersClassesService teachersClassesImplementation;
 
     @Autowired
     public TeachersClassesController(TeachersClassesService teachersClassesImplementation) {

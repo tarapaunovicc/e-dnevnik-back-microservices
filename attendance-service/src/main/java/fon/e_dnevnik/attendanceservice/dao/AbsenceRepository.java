@@ -11,6 +11,5 @@ import java.util.List;
 @Repository
 public interface AbsenceRepository extends JpaRepository<Absence, AbsencePK> {
     @Transactional(readOnly = true)
-
     List<Absence> findByIdStudentusername(String username);
 }

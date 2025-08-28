@@ -1,6 +1,5 @@
 package fon.e_dnevnik.attendanceservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import fon.e_dnevnik.attendanceservice.entity.primarykey.AbsencePK;
 import jakarta.persistence.*;
 import lombok.*;

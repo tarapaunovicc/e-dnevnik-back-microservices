@@ -55,7 +55,6 @@ public class AuthenticationService {
                 .build();
     }
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        System.out.println("In refresh token method.");
 
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String refreshToken;
@@ -81,7 +80,7 @@ public class AuthenticationService {
 
                 var authResponse = AuthenticationResponse.builder()
                         .accessToken(newAccessToken)
-                        .refreshToken(refreshToken) // Same refresh token is returned
+                        .refreshToken(refreshToken)
                         .build();
 
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
